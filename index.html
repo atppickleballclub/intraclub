@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ATP 3x3 Intraclub · Sun 13 Dec 2026</title>
+<meta name="description" content="ATP 3x3 Pickleball Intraclub. Back by popular demand. Sunday 13 December 2026, 10am to 1pm. Teams of 3, at least 1 female. Play to 21, rotate every 5 points.">
+<meta name="theme-color" content="#1f6b3a">
+<link rel="icon" type="image/png" href="images/atp-logo.png">
+<link rel="apple-touch-icon" href="images/atp-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Sans:wght@400;600;700&display=swap">
+<style>
+/* Front page only: header with fairy lights, poster centred over the stadium backdrop, countdown. */
+:root{
+  color-scheme:dark;
+  --ground:#06140f; --pine:#1f6b3a; --gold:#f0c24b; --ink:#f2f6f1; --soft:#d7e6dc;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--pine)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bg{position:fixed;inset:0;z-index:0;background:url(images/stadium.jpg) center top/cover no-repeat var(--ground)}
+.bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(4,20,14,.6))}
+#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--pine);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.hd{display:flex;align-items:center;gap:14px;padding-block:10px 6px}
+.badge{position:relative;flex:none;width:52px}
+.badge img{width:52px;height:auto;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.hat{position:absolute;width:34px;left:24px;top:-12px;transform:rotate(16deg)}
+h1{margin:0;font-family:var(--display);text-transform:uppercase;letter-spacing:.03em;line-height:.95;font-size:clamp(1.6rem,4.6vw,2.4rem);color:#fff;text-wrap:balance}
+h1 b{color:var(--gold);font-weight:900}
+.lights{position:relative;height:24px;overflow:hidden;background:var(--pine)}
+.lights svg{position:absolute;inset:0;width:100%;height:12px}
+.bulb{position:absolute;top:5px;width:9px;height:14px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;animation:tw 2.4s ease-in-out infinite}
+.bulb::before{content:"";position:absolute;top:-3px;left:2px;width:5px;height:4px;background:#24352a;border-radius:1px}
+@keyframes tw{0%,100%{opacity:1}50%{opacity:.4}}
+main{position:relative;z-index:2;padding-block:22px 40px;display:grid;justify-items:center;gap:16px}
+.poster{margin:0;border-radius:16px;overflow:hidden;border:3px solid rgba(255,255,255,.85);box-shadow:0 0 0 6px rgba(240,194,75,.35),0 24px 60px rgba(0,0,0,.65),0 0 80px rgba(190,230,255,.15);width:min(460px,100%,calc((100dvh - 250px) * .558));min-width:min(280px,100%)}
+.poster img{display:block;width:100%;height:auto}
+.cd{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.cd div{background:rgba(18,39,30,.85);border:1px solid rgba(240,194,75,.45);border-radius:12px;padding:8px 14px;min-width:76px;text-align:center}
+.cd b{display:block;font-family:var(--display);font-size:2.2rem;line-height:1;color:#fff;font-weight:900;font-variant-numeric:tabular-nums}
+.cd span{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.note{margin:0;font-size:.9rem;color:var(--soft);text-align:center}
+@media (prefers-reduced-motion:reduce){.bulb{animation:none}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<canvas id="snow" aria-hidden="true"></canvas>
+<header>
+  <div class="wrap hd">
+    <div class="badge"><img src="images/atp-logo.png" alt="ATP Pickleball Club" width="470" height="512"><svg class="hat" viewBox="0 0 64 48" aria-hidden="true"><path d="M6 38 C14 14 34 2 52 10 C46 16 44 24 46 34 Z" fill="#d23a3a"/><path d="M52 10 C58 14 60 22 56 28" stroke="#d23a3a" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="56" cy="30" r="6" fill="#fff"/><rect x="2" y="34" width="50" height="10" rx="5" fill="#fff"/></svg></div>
+    <h1>ATP 3x3 Intraclub <b>Sun 13 Dec 2026</b></h1>
+  </div>
+  <div class="lights" id="lights" aria-hidden="true"></div>
+</header>
+<main class="wrap">
+  <figure class="poster"><img src="images/poster.jpg" alt="ATP 3x3 Pickleball Intraclub Event. Sunday 13 December 2026, 10am to 1pm. Back by popular demand. Teams of 3, at least 1 female. Play to 21, rotate every 5 points. Team captains register their team. Matching outfits, prizes and glory to win, Christmas fun for all." width="768" height="1376"></figure>
+  <div class="cd" aria-live="polite"><div><b id="cd-d">–</b><span>days</span></div><div><b id="cd-h">–</b><span>hours</span></div><div><b id="cd-m">–</b><span>mins</span></div></div>
+  <p class="note" id="note">Sunday 13 December, 10am to 1pm. The draw goes up here closer to the day.</p>
+</main>
+<script>
+(function(){
+  var START=Date.UTC(2026,11,12,23,0,0); // Sun 13 Dec 2026 10:00 AEDT
+  function tick(){ var ms=Math.max(0,START-Date.now());
+    document.getElementById('cd-d').textContent=Math.floor(ms/864e5);
+    document.getElementById('cd-h').textContent=Math.floor(ms%864e5/36e5);
+    document.getElementById('cd-m').textContent=Math.floor(ms%36e5/6e4);
+    if (!ms) document.getElementById('note').textContent='It’s on! See you on court.'; }
+  tick(); setInterval(tick,30000);
+  var el=document.getElementById('lights'), cols=['#f0c24b','#d23a3a','#3fbf74','#4aa3ff','#ffffff'];
+  function draw(){ var w=el.clientWidth||400, gap=34, n=Math.ceil(w/gap)+1, d='M0 3';
+    for (var i=0;i<n;i++){ var x=i*gap; d+=' Q '+(x+gap/2)+' 11 '+(x+gap)+' 3'; }
+    var h='<svg viewBox="0 0 '+w+' 12" preserveAspectRatio="none"><path d="'+d+'" stroke="#0e2a1a" stroke-width="1.5" fill="none"/></svg>';
+    for (var j=0;j<n;j++){ var c=cols[j%cols.length]; h+='<span class="bulb" style="left:'+(j*gap+gap/2-4)+'px;background:'+c+';box-shadow:0 0 8px '+c+';animation-delay:'+((j%5)*.45)+'s"></span>'; }
+    el.innerHTML=h; }
+  draw(); var rt; addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(draw,150); });
+  var cv=document.getElementById('snow'), ctx=cv.getContext('2d'), reduce=matchMedia('(prefers-reduced-motion: reduce)').matches, W, H, fl=[];
+  function size(){ W=cv.width=innerWidth; H=cv.height=innerHeight; } size(); addEventListener('resize',size);
+  for (var i=0;i<50;i++) fl.push({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*2.4,s:.3+Math.random()*.7,d:Math.random()*6});
+  function frame(t){ ctx.clearRect(0,0,W,H); ctx.fillStyle='rgba(235,245,255,.5)';
+    fl.forEach(function(f){ if (!reduce){ f.y+=f.s; f.x+=Math.sin(t/1500+f.d)*.3; if (f.y>H+5){ f.y=-5; f.x=Math.random()*W; } } ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,6.283); ctx.fill(); });
+    if (!reduce) requestAnimationFrame(frame); }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
