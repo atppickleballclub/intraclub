@@ -1425,14 +1425,17 @@ if (window.firebase && FB && FB.apiKey){
     // Same layout as the Dural and Defend the Kitchen sites: the whole event is ONE document, events/<EVENT_ID>,
     // with fields setup, state, front and scores (a map of court id -> score card). Matches the existing Firestore rules.
     var evRef=fs.doc('events/'+EVENT_ID), evData=null;
+    // Firestore can't store a list inside a list, so each round of the draw is saved as {games:[...]}.
+    function encSetup(s){ var o=JSON.parse(JSON.stringify(s)); if (o.schedule) o.schedule=o.schedule.map(function(rd){ return {games:rd}; }); return o; }
+    function decSetup(s){ if (s && s.schedule) s.schedule=s.schedule.map(function(x){ return Array.isArray(x)?x:((x&&x.games)||[]); }); return s; }
     function fpFor(p){ var a=p.split('/'), segs=a[0]==='scores'?['scores',a[1]]:[a[1]]; var fp=new (Function.prototype.bind.apply(firebase.firestore.FieldPath,[null].concat(segs)))(); fp.__segs=segs; return fp; }
     function nestFor(fp,val){ var s=fp.__segs, o={}, cur=o; for (var i=0;i<s.length-1;i++){ cur[s[i]]={}; cur=cur[s[i]]; } cur[s[s.length-1]]=val; return o; }
     db={ doc:function(p){ return {
-      set:function(v){ var fp=fpFor(p); return evRef.update(fp,v).catch(function(err){ if (err&&err.code==='not-found') return evRef.set(nestFor(fp,v),{merge:true}); throw err; }); },
+      set:function(v){ if (p==='event/setup') v=encSetup(v); var fp=fpFor(p); return evRef.update(fp,v).catch(function(err){ if (err&&err.code==='not-found') return evRef.set(nestFor(fp,v),{merge:true}); throw err; }); },
       delete:function(){ return evRef.update(fpFor(p),firebase.firestore.FieldValue.delete()).catch(function(err){ if (err&&err.code==='not-found') return; throw err; }); } }; } };
     evRef.onSnapshot(function(snap){
       evData=snap.exists?(snap.data()||{}):{}; connected=true;
-      setup = evData.setup && evData.setup.teams && evData.setup.v===2 ? evData.setup : null;
+      setup = evData.setup && evData.setup.teams && evData.setup.v===2 ? decSetup(evData.setup) : null;
       state = evData.state && typeof evData.state.round==='number' ? evData.state : {round:-1};
       frontOn = !(evData.front && evData.front.on===false);
       scores = evData.scores || {};
