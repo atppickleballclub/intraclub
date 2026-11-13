@@ -120,6 +120,7 @@ label{font-size:.82rem;font-weight:600;color:var(--ink-soft);display:grid;gap:4p
 .fpswitch .knob::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--ink-soft);transition:left .15s}
 .fpswitch[aria-checked="true"] .knob{background:var(--holly)}
 .fpswitch[aria-checked="true"] .knob::after{left:16px;background:#fff}
+.pvbar .btn,.pvbar span{white-space:nowrap}
 .pvbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--gold);color:var(--gold-ink);font-weight:800;border-radius:99px;padding:6px 6px 6px 16px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 20px rgba(0,0,0,.4)}
 
 /* ---------- front page: poster centred over a blurred stadium-at-night backdrop ---------- */
@@ -400,7 +401,6 @@ body.tvmode main{padding-block:0;max-width:none}
       <div class="cd" aria-live="polite"><div><b id="cd-d">–</b><span>days</span></div><div><b id="cd-h">–</b><span>hours</span></div><div><b id="cd-m">–</b><span>mins</span></div></div>
       <p class="fp-note" id="fp-note">The draw goes up here closer to the day.</p>
       <div class="row fp-btns">
-        <button class="btn go" type="button" id="fp-rules">Game rules</button>
         <button class="btn red" type="button" id="fp-back" hidden>Back to the app →</button>
         <button class="linkbtn" type="button" id="fp-login">Committee log in</button>
       </div>
@@ -408,7 +408,7 @@ body.tvmode main{padding-block:0;max-width:none}
   </div>
 </div>
 
-<div class="pvbar" id="pvbar" hidden><span>Player view</span><button type="button" class="btn sm" id="pv-off">Back to committee</button></div>
+<div class="pvbar" id="pvbar" hidden><span>Player view</span><button type="button" class="btn sm" id="pv-skip">Skip front</button><button type="button" class="btn sm" id="pv-off">Exit</button></div>
 
 <main class="wrap" id="main">
 
@@ -741,19 +741,20 @@ function setStatus(){
   document.querySelectorAll('nav .cmte').forEach(function(b){ b.hidden=!isCmte(); });
   applyFront();
 }
-function frontShowing(){ return previewFront || (frontOn && !isCmte() && view.tab!=='login' && !(view.tab==='info' && rulesOpen)); }
+var skipFront=false; // player view only: see the app as players will once the front page is off
+function frontShowing(){ return previewFront || (frontOn && !isCmte() && !(asPlayer && skipFront) && view.tab!=='login' && !(view.tab==='info' && rulesOpen)); }
 var rulesOpen=false;
 function applyFront(){
   var fs=frontShowing();
   $('front').hidden=!fs; $('main').hidden=fs;
-  document.querySelector('header nav').hidden = fs || (frontOn && !isCmte());
+  document.querySelector('header nav').hidden = fs || (frontOn && !isCmte() && !(asPlayer && skipFront));
   $('fpctl').hidden = !(realCmte() && !asPlayer);
   $('fp-toggle').setAttribute('aria-checked', frontOn?'true':'false');
   $('fp-preview').hidden = !frontOn;
   $('fp-back').hidden = !previewFront;
-  $('fp-rules').hidden = previewFront;
   $('fp-login').hidden = realCmte();
   $('pvbar').hidden = !asPlayer;
+  $('pv-skip').hidden = !frontOn; $('pv-skip').textContent = skipFront ? 'Show front' : 'Skip front';
   var bo = frontOn && !isCmte() && view.tab==='info' && rulesOpen;
   if (bo && !$('rules-back')){ var b=document.createElement('button'); b.id='rules-back'; b.className='btn'; b.type='button'; b.textContent='Back'; b.style.marginTop='16px';
     b.onclick=function(){ rulesOpen=false; applyFront(); }; $('tab-info').appendChild(b); }
@@ -1366,8 +1367,8 @@ $('fp-toggle').onclick=function(){ saveFront(!frontOn); toast(frontOn?'Front pag
 $('fp-preview').onclick=function(){ previewFront=true; applyFront(); window.scrollTo(0,0); };
 $('fp-back').onclick=function(){ previewFront=false; applyFront(); };
 $('pv-on').onclick=function(){ asPlayer=true; show(view.tab); };
-$('pv-off').onclick=function(){ asPlayer=false; show(view.tab); };
-$('fp-rules').onclick=function(){ rulesOpen=true; view.tab='info'; show('info'); };
+$('pv-off').onclick=function(){ asPlayer=false; skipFront=false; show(view.tab); };
+$('pv-skip').onclick=function(){ skipFront=!skipFront; show(skipFront?homeTab():view.tab); window.scrollTo(0,0); };
 $('fp-login').onclick=function(){ afterLogin='live'; show('login'); };
 $('login-back').onclick=function(){ show(homeTab()); };
 $('logout-btn').onclick=function(){ if (fbAuth) fbAuth.signOut(); loggedIn=''; canWrite=false; asPlayer=false; setStatus(); show(homeTab()); };
