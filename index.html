@@ -389,6 +389,8 @@ body.tvmode.tvday .tvmapimg .day-tv{display:block}body.tvmode.tvday .tvmapimg .n
   #tab-score .ra{justify-content:flex-end;flex-wrap:nowrap}
   #tab-score .ra .msg{font-size:.75rem;text-align:right}
 }
+.saveall{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.saveall .msg{font-size:.85rem}
 /* committee tabs stay plain */
 #tab-setup .tcard,#tab-checkin .tcard,#tab-score .tcard{background:var(--panel-2);border:1px solid var(--rule);border-radius:12px;box-shadow:none;padding:12px}
 #tab-setup .tcard::before,#tab-setup .tcard::after,#tab-checkin .tcard::after,#tab-score .tcard::after{display:none}
@@ -868,7 +870,7 @@ body.tvmode.tvday .tvblk.now .bh{color:#08140d}body.tvmode.tvday .tvblk.nxt .bh{
 var $ = function(id){ return document.getElementById(id); };
 var EVENT_START = Date.UTC(2026,11,12,23,0,0); // Sun 13 Dec 2026 10:00 AEDT
 var EVENT_ID = window.EVENT_ID || 'christmas-3x3-2026';
-var APP_VERSION = '22 Nov b';  // shown in the committee bar, so you can tell which version a phone has loaded
+var APP_VERSION = '22 Nov c';  // shown in the committee bar, so you can tell which version a phone has loaded
 var NAMES = ['Rudolph','Dasher','Dancer','Prancer','Vixen','Comet','Cupid','Donner','Blitzen','Elves','Grinches','Pavlovas','Snowmen','Bon-bons','Tinsel','Puddings','Candy Canes','Baubles','Reindeer','Mistletoe'];
 
 // ---------- state ----------
@@ -1339,8 +1341,28 @@ function renderScore(){
         '<div class="rs"><label class="tm" for="sa-'+id+'"><span class="tmn"><span class="dot2 a"></span>'+esc(A.name)+'</span><span class="tmp">'+pnames(A)+'</span></label><input id="sa-'+id+'" type="number" inputmode="numeric" min="0" max="60" value="'+(done?s.a:'')+'" aria-label="'+esc(A.name)+' score">'+
         '<span class="dash">–</span><input id="sb-'+id+'" type="number" inputmode="numeric" min="0" max="60" value="'+(done?s.b:'')+'" aria-label="'+esc(B.name)+' score"><label class="tm r" for="sb-'+id+'"><span class="tmn">'+esc(B.name)+'<span class="dot2 b"></span></span><span class="tmp">'+pnames(B)+'</span></label></div>'+
         '<div class="ra"><span class="msg" id="msg-'+id+'"></span><span class="row">'+(done?'<button class="linkbtn" type="button" data-clear="'+id+'">Clear</button>':'')+'<button class="btn go sm" type="button" data-save="'+id+'">'+(done?'Update':'Save')+'</button></span></div></div>';
-    }).join('')+'</div>';
+    }).join('')+'</div>'+
+    '<div class="saveall"><span class="msg" id="saveall-msg"></span><button class="btn go" type="button" id="saveall">Save all</button></div>';
   Object.keys(keep).forEach(function(k){ if ($(k)) $(k).value=keep[k]; }); if (act && $(act) && $(act).tagName==='INPUT') $(act).focus();
+  $('saveall').onclick=function(){
+    var good=[], bad=[], skipped=0;
+    rd.forEach(function(g){ var id=mid(r,g.court); if (!$('sa-'+id)) return;
+      var va=$('sa-'+id).value.trim(), vb=$('sb-'+id).value.trim(), m=scores[id];
+      if (!va && !vb) return;
+      if (!va || !vb){ skipped++; bad.push({id:id,court:g.court,err:'Enter both scores.',hard:true}); return; }
+      var a=parseInt(va,10), bb=parseInt(vb,10), s0=sc(m);
+      if (m && m.done && s0.a===a && s0.b===bb) return; // already saved, unchanged
+      var err=validScore(a,bb); if (err){ bad.push({id:id,court:g.court,err:err}); return; }
+      var ids=sides(r,g); good.push({id:id,court:g.court,v:{sa:a,sb:bb,done:true,a:ids.a,b:ids.b,at:new Date().toISOString()}}); });
+    if (!good.length && !bad.length){ $('saveall-msg').textContent='Nothing new to save.'; $('saveall-msg').className='msg'; return; }
+    good.forEach(function(x){ saveScore(x.id,x.v); });
+    var note=(good.length?'Saved '+good.length+' court'+(good.length>1?'s':'')+'.':'')+(bad.length?' Check court'+(bad.length>1?'s ':' ')+bad.map(function(x){ return x.court; }).join(', ')+'.':'');
+    toast(note.trim());
+    setTimeout(function(){ // after the save redraws the list, flag the ones that need a look
+      bad.forEach(function(x){ var row=document.querySelector('.res-row[data-id="'+x.id+'"]'); if (!row) return; var bt=row.querySelector('[data-save]'), mg=$('msg-'+x.id);
+        mg.textContent=x.err; mg.className='msg err'; if (!x.hard){ bt.dataset.armed='1'; bt.textContent='Save anyway'; bt.className='btn danger sm'; } });
+      if ($('saveall-msg')){ $('saveall-msg').textContent=note.trim(); $('saveall-msg').className='msg '+(bad.length?'err':'ok'); } },60);
+  };
   el.querySelectorAll('[data-sr]').forEach(function(b){ b.onclick=function(){ view.scoreRound=+b.dataset.sr; renderScore(); }; });
   el.querySelectorAll('[data-save]').forEach(function(b){ b.onclick=function(){
     var id=b.dataset.save, g=rd.filter(function(x){ return mid(r,x.court)===id; })[0], ids=sides(r,g), a=parseInt($('sa-'+id).value,10), bb=parseInt($('sb-'+id).value,10), msg=$('msg-'+id);
@@ -1866,12 +1888,15 @@ tick(); setInterval(tick,30000);
   var cols=['#f0c24b','#d23a3a','#3fbf74','#4aa3ff','#ffffff'];
   function draw(){ document.querySelectorAll('.lights').forEach(drawOne); }
   window.__drawLights=draw;
-  function drawOne(el){ var w=el.clientWidth||400, gap=34, n=Math.ceil(w/gap)+1, d='M0 3';
+  function drawOne(el){ var w=Math.max(el.clientWidth||0, document.documentElement.clientWidth||0, innerWidth||0, 400), gap=34, n=Math.ceil(w/gap)+1, d='M0 3';
     for (var i=0;i<n;i++){ var x=i*gap; d+=' Q '+(x+gap/2)+' 11 '+(x+gap)+' 3'; }
     var h='<svg viewBox="0 0 '+w+' 12" preserveAspectRatio="none"><path d="'+d+'" stroke="#0e2a1a" stroke-width="1.5" fill="none"/></svg>';
     for (var j=0;j<n;j++){ var c=cols[j%cols.length]; h+='<span class="bulb" style="left:'+(j*gap+gap/2-4)+'px;background:'+c+';box-shadow:0 0 8px '+c+';animation-delay:'+((j%5)*.45)+'s"></span>'; }
     el.innerHTML=h; }
   draw(); var rt; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(draw,150); });
+  // redraw whenever a light strip changes size or appears (e.g. after the front page is skipped)
+  if (window.ResizeObserver){ var ro=new ResizeObserver(function(){ clearTimeout(rt); rt=setTimeout(draw,100); }); document.querySelectorAll('.lights').forEach(function(el){ ro.observe(el); }); }
+  window.addEventListener('load',draw);
   var cv=$('snow'), ctx=cv.getContext('2d'), reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches, W, H, flakes=[];
   function size(){ W=cv.width=innerWidth; H=cv.height=innerHeight; } size(); addEventListener('resize',size);
   for (var i=0;i<50;i++) flakes.push({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*2.4,s:.3+Math.random()*.7,d:Math.random()*6,a:Math.random()*6.283,spin:(Math.random()-.5)*.012});
