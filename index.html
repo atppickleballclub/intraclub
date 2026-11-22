@@ -391,6 +391,18 @@ body.tvmode.tvday .tvmapimg .day-tv{display:block}body.tvmode.tvday .tvmapimg .n
 }
 .saveall{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
 .saveall .msg{font-size:.85rem}
+/* Outdoor on a PC: keep the dark green page, only the boxes go white (phones get the all-white page) */
+@media (min-width:900px){
+  body.outdoor:not(.tvmode){background:#0b1a14;--ground:#0b1a14}
+  body.outdoor:not(.tvmode) #main,body.outdoor:not(.tvmode) #fpctl,body.outdoor:not(.tvmode) #status{--ink:#f2f6f1;--ink-soft:#d3e0d7;--rule:rgba(240,246,240,.2);--panel:#12271e;--panel-2:#183326;--ground:#0b1a14;color:var(--ink)}
+  body.outdoor:not(.tvmode) .card,body.outdoor:not(.tvmode) .court,body.outdoor:not(.tvmode) .mg,body.outdoor:not(.tvmode) .bk,body.outdoor:not(.tvmode) .tablewrap,body.outdoor:not(.tvmode) .tcard,body.outdoor:not(.tvmode) .res-row,body.outdoor:not(.tvmode) .champ,body.outdoor:not(.tvmode) .qrcard,body.outdoor:not(.tvmode) .empty,body.outdoor:not(.tvmode) .ci,body.outdoor:not(.tvmode) input,body.outdoor:not(.tvmode) select,body.outdoor:not(.tvmode) textarea,body.outdoor:not(.tvmode) .tvci-team,body.outdoor:not(.tvmode) .mesearch,body.outdoor:not(.tvmode) #me-list{--ink:#08140d;--ink-soft:#2a3a30;--rule:rgba(8,30,18,.28);--panel:#ffffff;--panel-2:#e9efe9;--ground:#ffffff;color:var(--ink)}
+  body.outdoor:not(.tvmode) #main .card,body.outdoor:not(.tvmode) #main .court,body.outdoor:not(.tvmode) #main .mg,body.outdoor:not(.tvmode) #main .bk,body.outdoor:not(.tvmode) #main .tablewrap,body.outdoor:not(.tvmode) #main .tcard,body.outdoor:not(.tvmode) #main .res-row,body.outdoor:not(.tvmode) #main .empty,body.outdoor:not(.tvmode) #main .ci{background:linear-gradient(160deg,#f1f8ef,#dcebd9)!important;--panel:#e8f2e5;--panel-2:#d6e7d2}
+  body.outdoor:not(.tvmode) #main .ci.on{background:#c6e8cf!important}
+  body.outdoor:not(.tvmode) #main tr.top td{background:#fff4d6}
+  body.outdoor:not(.tvmode) #main .divh.dA{color:#f0c24b}
+  body.outdoor:not(.tvmode) #main .divh.dB{color:#a9d4f5}
+  body.outdoor:not(.tvmode) #main .sechead .eyebrow{color:#d3e0d7}
+}
 /* committee tabs stay plain */
 #tab-setup .tcard,#tab-checkin .tcard,#tab-score .tcard{background:var(--panel-2);border:1px solid var(--rule);border-radius:12px;box-shadow:none;padding:12px}
 #tab-setup .tcard::before,#tab-setup .tcard::after,#tab-checkin .tcard::after,#tab-score .tcard::after{display:none}
@@ -870,7 +882,7 @@ body.tvmode.tvday .tvblk.now .bh{color:#08140d}body.tvmode.tvday .tvblk.nxt .bh{
 var $ = function(id){ return document.getElementById(id); };
 var EVENT_START = Date.UTC(2026,11,12,23,0,0); // Sun 13 Dec 2026 10:00 AEDT
 var EVENT_ID = window.EVENT_ID || 'christmas-3x3-2026';
-var APP_VERSION = '22 Nov c';  // shown in the committee bar, so you can tell which version a phone has loaded
+var APP_VERSION = '23 Nov b';  // shown in the committee bar, so you can tell which version a phone has loaded
 var NAMES = ['Rudolph','Dasher','Dancer','Prancer','Vixen','Comet','Cupid','Donner','Blitzen','Elves','Grinches','Pavlovas','Snowmen','Bon-bons','Tinsel','Puddings','Candy Canes','Baubles','Reindeer','Mistletoe'];
 
 // ---------- state ----------
@@ -1905,7 +1917,7 @@ tick(); setInterval(tick,30000);
     for (var k=0;k<6;k++){ ctx.moveTo(0,0); ctx.lineTo(0,-L); ctx.moveTo(0,-L*.55); ctx.lineTo(-L*.22,-L*.78); ctx.moveTo(0,-L*.55); ctx.lineTo(L*.22,-L*.78); ctx.rotate(Math.PI/3); }
     ctx.stroke(); ctx.restore(); }
   function frame(t){ ctx.clearRect(0,0,W,H);
-    var bc=document.body.classList, out=(bc.contains('outdoor')&&!bc.contains('tvmode'))||(bc.contains('tvmode')&&bc.contains('tvday'));
+    var bc=document.body.classList, out=(bc.contains('outdoor')&&!bc.contains('tvmode')&&innerWidth<900)||(bc.contains('tvmode')&&bc.contains('tvday'));
     if (view.tab!=='score'){ ctx.strokeStyle=out?'rgba(96,150,196,.6)':'rgba(235,245,255,.6)'; ctx.lineWidth=1.4; ctx.lineCap='round';
       flakes.forEach(function(f,i){ if (!reduce){ f.y+=f.s*.8; f.x+=Math.sin(t/1500+f.d)*.3; f.a+=f.spin; if (f.y>H+12){ f.y=-12; f.x=Math.random()*W; } }
         if (i<24) drawFlake(f); }); }
