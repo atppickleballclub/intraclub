@@ -882,7 +882,7 @@ body.tvmode.tvday .tvblk.now .bh{color:#08140d}body.tvmode.tvday .tvblk.nxt .bh{
 var $ = function(id){ return document.getElementById(id); };
 var EVENT_START = Date.UTC(2026,11,12,23,0,0); // Sun 13 Dec 2026 10:00 AEDT
 var EVENT_ID = window.EVENT_ID || 'christmas-3x3-2026';
-var APP_VERSION = '23 Nov b';  // shown in the committee bar, so you can tell which version a phone has loaded
+var APP_VERSION = '26 Nov';  // shown in the committee bar, so you can tell which version a phone has loaded
 var NAMES = ['Rudolph','Dasher','Dancer','Prancer','Vixen','Comet','Cupid','Donner','Blitzen','Elves','Grinches','Pavlovas','Snowmen','Bon-bons','Tinsel','Puddings','Candy Canes','Baubles','Reindeer','Mistletoe'];
 
 // ---------- state ----------
@@ -1977,6 +1977,14 @@ if (window.firebase && FB && FB.apiKey){
 } else {
   startPractice();
 }
+// ---------- usage counter (players only) ----------
+// Counts player visits in the ATP Events app stats. Waits for the login check, then skips
+// committee logins, the TV/timer screens and test copies so they don't add to the counts.
+(function(){ var done=false;
+  function usage(){ if (done) return; try{ if (practice || loggedIn || view.tab==='tv' || document.body.classList.contains('tvmode')) return; }catch(e){ return; }
+    done=true; var s=document.createElement('script'); s.src='https://eventsapp.atppickleballclub.com.au/usage.js'; s.defer=true; s.setAttribute('data-site','intraclub'); document.body.appendChild(s); }
+  setTimeout(usage,5000);
+})();
 })();
 </script>
 </body>
